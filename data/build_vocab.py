@@ -1,12 +1,11 @@
 import re
 from collections import Counter
-import torch 
 
 class Vocab:
     def __init__(self, min_freq=2):
         self.min_freq = min_freq
-        self.word2idx = {"<pad>": 0, "<unk>": 1}
-        self.idx2word = {0: "<pad>", 1: "<unk>"}
+        self.word2idx = {"<unk>": 0, "<pad>": 1}
+        self.idx2word = {0: "<unk>", 1: "<pad>"}
 
     def tokenize(self, text):
         text = text.lower()
@@ -17,6 +16,7 @@ class Vocab:
         counter = Counter()
         for text in texts:
             counter.update(self.tokenize(text))
+        
         idx = len(self.word2idx)
 
         for word, freq in counter.items():
@@ -24,7 +24,7 @@ class Vocab:
                 self.word2idx[word] = idx
                 self.idx2word[idx] = word
                 idx += 1
-    
+
     def encode(self, text, max_len):
         tokens = self.tokenize(text)
         ids = [self.word2idx.get(tok, self.word2idx["<unk>"]) for tok in tokens]
@@ -35,3 +35,4 @@ class Vocab:
     
     def __len__(self):
         return len(self.word2idx)
+    
