@@ -24,6 +24,8 @@ class MultiHeadAttention(nn.Module):
         k = self.k(x).view(B, T, self.num_heads, self.d_k).transpose(1, 2)
         v = self.v(x).view(B, T, self.num_heads, self.d_k).transpose(1, 2)
 
+        scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
+
         if mask is not None:
             mask = mask.unsqueeze(1).unsqueeze(2)
             scores = scores.float().masked_fill(
@@ -31,7 +33,7 @@ class MultiHeadAttention(nn.Module):
             ).type_as(scores)
 
         attn = torch.softmax(scores, dim=-1)
-        context = attn @ v
+        context = torch.matmul(attn, v)
 
         context = context.transpose(1, 2).contiguous().view(B, T, C)
 

@@ -16,8 +16,8 @@ def main():
     vocab = build_vocab(texts)
     config.vocab_size = len(vocab)
 
-    train_ds = EmotionDataset(vocab, split="train", max_len=config.max_len)
-    val_ds = EmotionDataset(vocab, split="validation", max_len=config.max_len)
+    train_ds = EmotionDataset(split="train", vocab=vocab, max_len=config.max_len)
+    val_ds = EmotionDataset(split="validation", vocab=vocab, max_len=config.max_len)
     train_loader = DataLoader(train_ds, batch_size=config.batch_size, shuffle=True)
     val_loader = DataLoader(val_ds, batch_size=config.batch_size)
 
