@@ -26,10 +26,13 @@ class Trainer:
         total_loss = 0
         
         loop = tqdm(self.train_loader, leave=True)
-        for x, mask, y in loop:
-            x, mask, y = x.to(self.device), mask.to(self.device), y.to(self.device)
+        for batch in loop:
+            x = batch["input_ids"].to(self.device)
+            mask = batch["attention_mask"].to(self.device)
+            y = batch["label"].to(self.device)
+
             self.optimizer.zero_grad()
-            with autocast():
+            with autocast(enabled=(self.device == "cuda"), device_type=self.device):
                 pred = self.model(x, mask)
                 loss = self.criterion(pred, y)
             
@@ -48,8 +51,11 @@ class Trainer:
         total_acc = 0
 
         with torch.no_grad():
-            for x, mask, y in self.val_loader:
-                x, mask, y = x.to(self.device), mask.to(self.device), y.to(self.device)
+            for batch in self.val_loader:
+                x = batch["input_ids"].to(self.device)
+                mask = batch["attention_mask"].to(self.device)
+                y = batch["label"].to(self.device)
+
                 out = self.model(x, mask)
                 total_acc += accuracy(out, y)
 
